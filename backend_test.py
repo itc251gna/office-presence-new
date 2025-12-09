@@ -173,6 +173,61 @@ class AttendanceAPITester:
         )
         return success, response
 
+    # Admin endpoints tests
+    def test_admin_stats(self):
+        """Test admin stats endpoint"""
+        success, response = self.run_test(
+            "Admin Stats (/api/admin/stats)",
+            "GET",
+            "api/admin/stats",
+            200
+        )
+        return success, response
+
+    def test_admin_clear_old_sessions(self):
+        """Test admin clear old sessions"""
+        success, response = self.run_test(
+            "Admin Clear Old Sessions (/api/admin/clear-old-sessions)",
+            "POST",
+            "api/admin/clear-old-sessions",
+            200
+        )
+        return success, response
+
+    def test_admin_delete_attendance(self, attendance_id):
+        """Test admin delete attendance"""
+        success, response = self.run_test(
+            f"Admin Delete Attendance (/api/admin/attendances/{attendance_id})",
+            "DELETE",
+            f"api/admin/attendances/{attendance_id}",
+            200
+        )
+        return success, response
+
+    def test_admin_delete_user_unauthorized(self, user_id):
+        """Test admin delete user (should fail for non-admin)"""
+        success, response = self.run_test(
+            f"Admin Delete User - Unauthorized (/api/admin/users/{user_id})",
+            "DELETE",
+            f"api/admin/users/{user_id}",
+            403  # Should fail with 403 for non-admin users
+        )
+        return success, response
+
+    def test_non_admin_access_to_admin_endpoints(self):
+        """Test that non-admin users cannot access admin endpoints"""
+        print("\n🔒 Testing admin endpoint security for non-admin users...")
+        
+        # Test admin stats (should fail)
+        success, _ = self.run_test(
+            "Non-Admin Access to Stats (should fail)",
+            "GET",
+            "api/admin/stats",
+            403
+        )
+        
+        return success
+
 def main():
     print("🚀 Starting Greek Office Attendance Calendar API Tests")
     print("=" * 60)
