@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { LogOut, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AttendanceDialog from '../components/AttendanceDialog';
+import { isNonWorkingDay } from '../utils/holidays';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -129,24 +130,45 @@ const Dashboard = () => {
         day === today.getDate() &&
         currentMonth === today.getMonth() &&
         currentYear === today.getFullYear();
+      
+      // Check if it's a non-working day (weekend or holiday)
+      const { isNonWorkingDay: isHoliday, reason } = isNonWorkingDay(dateStr);
 
       days.push(
         <div
           key={day}
           data-testid={`calendar-day-${dateStr}`}
           onClick={() => handleDateClick(dateStr)}
-          className={`min-h-[120px] border border-slate-200 rounded-lg p-3 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg bg-white ${
+          className={`min-h-[120px] border rounded-lg p-3 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg relative ${
             isToday ? 'ring-2 ring-slate-700' : ''
+          } ${
+            isHoliday ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-200'
           }`}
         >
           <div className="flex justify-between items-start mb-2">
-            <span className={`text-sm font-medium ${isToday ? 'text-slate-900 font-bold' : 'text-slate-600'}`}>
+            <span className={`text-sm font-medium ${
+              isToday ? 'text-slate-900 font-bold' : isHoliday ? 'text-rose-700' : 'text-slate-600'
+            }`}>
               {day}
             </span>
-            {isToday && (
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Σήμερα</span>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {isToday && (
+                <span className="text-[10px] text-slate-500 uppercase tracking-wider">Σήμερα</span>
+              )}
+              {isHoliday && (
+                <span className="text-[9px] text-rose-600 uppercase tracking-wider font-medium">
+                  {reason === 'Σαββατοκύριακο' ? 'Σ/Κ' : 'Αργία'}
+                </span>
+              )}
+            </div>
           </div>
+          {isHoliday && reason !== 'Σαββατοκύριακο' && (
+            <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+              <span className="text-[8px] text-rose-600 font-medium px-1 py-0.5 bg-rose-100 rounded">
+                {reason}
+              </span>
+            </div>
+          )}
           <div className="space-y-1">
             {dayAttendances.slice(0, 3).map((att) => (
               <div
@@ -168,11 +190,19 @@ const Dashboard = () => {
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-7 gap-2">
-          {weekDays.map((day) => (
-            <div key={day} className="text-center text-xs font-medium text-slate-500 uppercase tracking-wider py-2">
-              {day}
-            </div>
-          ))}
+          {weekDays.map((day, index) => {
+            const isWeekendDay = index === 5 || index === 6; // Saturday or Sunday
+            return (
+              <div
+                key={day}
+                className={`text-center text-xs font-medium uppercase tracking-wider py-2 ${
+                  isWeekendDay ? 'text-rose-600' : 'text-slate-500'
+                }`}
+              >
+                {day}
+              </div>
+            );
+          })}
         </div>
         <div className="grid grid-cols-7 gap-2">{days}</div>
       </div>
@@ -303,6 +333,14 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
               <span className="text-slate-600">Απών</span>
+            </div>
+            <div className="border-l border-slate-300 pl-6 ml-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded bg-rose-50 border border-rose-200 flex items-center justify-center">
+                  <span className="text-[10px] text-rose-600 font-medium">Σ/Κ</span>
+                </div>
+                <span className="text-slate-600">Αργία/Σαββατοκύριακο</span>
+              </div>
             </div>
           </div>
 
