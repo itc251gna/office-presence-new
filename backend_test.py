@@ -275,6 +275,32 @@ def main():
         # Verify deletion
         tester.test_get_attendances()
 
+    # Test admin endpoints (if user is admin)
+    print("\n🔐 ADMIN ENDPOINTS TESTS")
+    print("-" * 30)
+    
+    # Check if current user is admin
+    if user_data and user_data.get('is_admin'):
+        print("✅ Current user is admin, testing admin endpoints...")
+        
+        # Test admin stats
+        tester.test_admin_stats()
+        
+        # Test clear old sessions
+        tester.test_admin_clear_old_sessions()
+        
+        # Test admin delete attendance (if we have an attendance)
+        if attendance_id:
+            # Create a new attendance for admin deletion test
+            create_success, admin_att_data = tester.test_create_attendance()
+            if create_success and 'attendance_id' in admin_att_data:
+                admin_att_id = admin_att_data['attendance_id']
+                tester.test_admin_delete_attendance(admin_att_id)
+    else:
+        print("ℹ️  Current user is not admin, testing security restrictions...")
+        # Test that non-admin cannot access admin endpoints
+        tester.test_non_admin_access_to_admin_endpoints()
+
     # Test logout (optional - will invalidate session)
     print("\n🚪 LOGOUT TEST")
     print("-" * 30)
