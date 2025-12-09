@@ -57,6 +57,25 @@ class AttendanceUpdate(BaseModel):
 class AdminAttendanceDelete(BaseModel):
     attendance_id: str
 
+# Helper function to check if date is in allowed period (Dec 17 - Jan 11)
+def is_date_in_allowed_period(date_str: str) -> bool:
+    try:
+        date_parts = date_str.split('-')
+        month = int(date_parts[1])
+        day = int(date_parts[2])
+        
+        # December 17-31
+        if month == 12 and day >= 17:
+            return True
+        
+        # January 1-11
+        if month == 1 and day <= 11:
+            return True
+        
+        return False
+    except:
+        return False
+
 # Auth helper function
 async def get_current_user(request: Request, session_token: Optional[str] = Cookie(None)) -> User:
     # Check cookie first, then Authorization header
@@ -233,6 +252,13 @@ async def create_attendance(
 ):
     user = await get_current_user(request, session_token)
     
+    # Validate date is in allowed period
+    if not is_date_in_allowed_period(input.date):
+        raise HTTPException(
+            status_code=400, 
+            detail="Οι δηλώσεις παρουσιών επιτρέπονται μόνο για το διάστημα 17/12 - 11/1"
+        )
+    
     # Check if attendance already exists for this user and date
     existing = await db.attendances.find_one({
         "user_id": user.user_id,
@@ -276,6 +302,13 @@ async def update_attendance(
     if not attendance:
         raise HTTPException(status_code=404, detail="Attendance not found")
     
+    # Validate date is in allowed period
+    if not is_date_in_allowed_period(attendance['date']):
+        raise HTTPException(
+            status_code=400, 
+            detail="Οι τροποποιήσεις παρουσιών επιτρέπονται μόνο για το διάστημα 17/12 - 11/1"
+        )
+    
     # Update fields
     update_data = {}
     if input.status:
@@ -303,6 +336,22 @@ async def delete_attendance(
     session_token: Optional[str] = Cookie(None)
 ):
     user = await get_current_user(request, session_token)
+    
+    # Find attendance first to check date
+    attendance = await db.attendances.find_one({
+        "attendance_id": attendance_id,
+        "user_id": user.user_id
+    }, {"_id": 0})
+    
+    if not attendance:
+        raise HTTPException(status_code=404, detail="Attendance not found")
+    
+    # Validate date is in allowed period
+    if not is_date_in_allowed_period(attendance['date']):
+        raise HTTPException(
+            status_code=400, 
+            detail="Οι διαγραφές παρουσιών επιτρέπονται μόνο για το διάστημα 17/12 - 11/1"
+        )
     
     result = await db.attendances.delete_one({
         "attendance_id": attendance_id,

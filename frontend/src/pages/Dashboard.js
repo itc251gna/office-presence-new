@@ -3,10 +3,11 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { LogOut, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { LogOut, ChevronLeft, ChevronRight, Settings, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AttendanceDialog from '../components/AttendanceDialog';
 import { isNonWorkingDay } from '../utils/holidays';
+import { isDateInAllowedPeriod } from '../utils/dateValidation';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -67,7 +68,11 @@ const Dashboard = () => {
     return day === 0 ? 6 : day - 1; // Convert to Monday=0
   };
 
-  const handleDateClick = (date) => {
+  const handleDateClick = (date, isAllowed) => {
+    if (!isAllowed) {
+      toast.error('Οι δηλώσεις παρουσιών επιτρέπονται μόνο για το διάστημα 17/12 - 11/1');
+      return;
+    }
     setSelectedDate(date);
     setDialogOpen(true);
   };
@@ -133,21 +138,26 @@ const Dashboard = () => {
       
       // Check if it's a non-working day (weekend or holiday)
       const { isNonWorkingDay: isHoliday, reason } = isNonWorkingDay(dateStr);
+      
+      // Check if date is in allowed period for submissions
+      const isAllowed = isDateInAllowedPeriod(dateStr);
 
       days.push(
         <div
           key={day}
           data-testid={`calendar-day-${dateStr}`}
-          onClick={() => handleDateClick(dateStr)}
-          className={`min-h-[120px] border rounded-lg p-3 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg relative ${
+          onClick={() => handleDateClick(dateStr, isAllowed)}
+          className={`min-h-[120px] border rounded-lg p-3 transition-all relative ${
             isToday ? 'ring-2 ring-slate-700' : ''
           } ${
             isHoliday ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-200'
+          } ${
+            !isAllowed ? 'opacity-60 cursor-not-allowed bg-slate-50' : 'cursor-pointer hover:-translate-y-1 hover:shadow-lg'
           }`}
         >
           <div className="flex justify-between items-start mb-2">
             <span className={`text-sm font-medium ${
-              isToday ? 'text-slate-900 font-bold' : isHoliday ? 'text-rose-700' : 'text-slate-600'
+              isToday ? 'text-slate-900 font-bold' : isHoliday ? 'text-rose-700' : !isAllowed ? 'text-slate-400' : 'text-slate-600'
             }`}>
               {day}
             </span>
@@ -159,6 +169,9 @@ const Dashboard = () => {
                 <span className="text-[9px] text-rose-600 uppercase tracking-wider font-medium">
                   {reason === 'Σαββατοκύριακο' ? 'Σ/Κ' : 'Αργία'}
                 </span>
+              )}
+              {!isAllowed && (
+                <Lock className="w-3 h-3 text-slate-400" />
               )}
             </div>
           </div>
@@ -320,8 +333,16 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Period Notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center gap-3">
+            <Lock className="w-5 h-5 text-blue-600 flex-shrink-0" />
+            <div className="text-sm text-blue-900">
+              <span className="font-semibold">Περίοδος Δηλώσεων:</span> Οι δηλώσεις παρουσιών επιτρέπονται μόνο για το διάστημα <strong>17 Δεκεμβρίου - 11 Ιανουαρίου</strong>
+            </div>
+          </div>
+
           {/* Legend */}
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-6 text-sm flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
               <span className="text-slate-600">Παρών</span>
@@ -340,6 +361,12 @@ const Dashboard = () => {
                   <span className="text-[10px] text-rose-600 font-medium">Σ/Κ</span>
                 </div>
                 <span className="text-slate-600">Αργία/Σαββατοκύριακο</span>
+              </div>
+            </div>
+            <div className="border-l border-slate-300 pl-6 ml-2">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-slate-400" />
+                <span className="text-slate-600">Κλειδωμένη ημέρα</span>
               </div>
             </div>
           </div>
