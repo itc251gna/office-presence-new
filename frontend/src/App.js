@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import AdminPanel from './pages/AdminPanel';
 import AuthCallback from './pages/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from './components/ui/sonner';
@@ -24,6 +25,14 @@ function AppRouter() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
             </ProtectedRoute>
           }
         />
