@@ -32,6 +32,7 @@ class User(BaseModel):
     email: str
     name: str
     picture: Optional[str] = None
+    is_admin: bool = False
     created_at: datetime
 
 class Attendance(BaseModel):
@@ -52,6 +53,9 @@ class AttendanceCreate(BaseModel):
 class AttendanceUpdate(BaseModel):
     status: Optional[str] = None
     notes: Optional[str] = None
+
+class AdminAttendanceDelete(BaseModel):
+    attendance_id: str
 
 # Auth helper function
 async def get_current_user(request: Request, session_token: Optional[str] = Cookie(None)) -> User:
@@ -129,12 +133,14 @@ async def auth_callback(request: Request, response: Response):
             {"$set": {"name": name, "picture": picture}}
         )
     else:
-        # Create new user
+        # Create new user - check if admin email
+        is_admin = email == "ckonstantopoulos75@gmail.com"
         user_doc = {
             "user_id": user_id,
             "email": email,
             "name": name,
             "picture": picture,
+            "is_admin": is_admin,
             "created_at": datetime.now(timezone.utc)
         }
         await db.users.insert_one(user_doc)
@@ -185,6 +191,8 @@ async def get_users(request: Request, session_token: Optional[str] = Cookie(None
     for user in users:
         if isinstance(user['created_at'], str):
             user['created_at'] = datetime.fromisoformat(user['created_at'])
+        if 'is_admin' not in user:
+            user['is_admin'] = False
     
     return users
 
@@ -305,6 +313,95 @@ async def delete_attendance(
         raise HTTPException(status_code=404, detail="Attendance not found")
     
     return {"message": "Attendance deleted"}
+
+# Admin endpoints
+@api_router.get("/admin/stats")
+async def get_admin_stats(request: Request, session_token: Optional[str] = Cookie(None)):
+    user = await get_current_user(request, session_token)
+    
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    total_users = await db.users.count_documents({})
+    total_attendances = await db.attendances.count_documents({})
+    total_sessions = await db.user_sessions.count_documents({})
+    
+    # Get attendances by status
+    present_count = await db.attendances.count_documents({"status": "present"})
+    remote_count = await db.attendances.count_documents({"status": "remote"})
+    absent_count = await db.attendances.count_documents({"status": "absent"})
+    
+    return {
+        "total_users": total_users,
+        "total_attendances": total_attendances,
+        "total_sessions": total_sessions,
+        "status_breakdown": {
+            "present": present_count,
+            "remote": remote_count,
+            "absent": absent_count
+        }
+    }
+
+@api_router.delete("/admin/attendances/{attendance_id}")
+async def admin_delete_attendance(
+    attendance_id: str,
+    request: Request,
+    session_token: Optional[str] = Cookie(None)
+):
+    user = await get_current_user(request, session_token)
+    
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.attendances.delete_one({"attendance_id": attendance_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Attendance not found")
+    
+    return {"message": "Attendance deleted by admin"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def admin_delete_user(
+    user_id: str,
+    request: Request,
+    session_token: Optional[str] = Cookie(None)
+):
+    user = await get_current_user(request, session_token)
+    
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Don't allow deleting self
+    if user_id == user.user_id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Delete user's attendances
+    await db.attendances.delete_many({"user_id": user_id})
+    
+    # Delete user's sessions
+    await db.user_sessions.delete_many({"user_id": user_id})
+    
+    # Delete user
+    result = await db.users.delete_one({"user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User and related data deleted"}
+
+@api_router.post("/admin/clear-old-sessions")
+async def admin_clear_old_sessions(request: Request, session_token: Optional[str] = Cookie(None)):
+    user = await get_current_user(request, session_token)
+    
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Delete expired sessions
+    result = await db.user_sessions.delete_many({
+        "expires_at": {"$lt": datetime.now(timezone.utc)}
+    })
+    
+    return {"message": f"Deleted {result.deleted_count} expired sessions"}
 
 # Include the router in the main app
 app.include_router(api_router)

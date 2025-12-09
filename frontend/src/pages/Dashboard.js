@@ -3,12 +3,14 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AttendanceDialog from '../components/AttendanceDialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [attendances, setAttendances] = useState([]);
@@ -190,8 +192,9 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className="w-64 bg-white border-r border-slate-200 p-6 space-y-6 flex flex-col">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">OfficePulse</h2>
-          <p className="text-xs text-slate-400 uppercase tracking-wider">Διαχείριση Παρουσιών</p>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900">251 ΓΝΑ</h2>
+          <p className="text-sm font-semibold text-slate-700 mt-1">Κέντρο Μηχανογράφησης</p>
+          <p className="text-xs text-slate-400 uppercase tracking-wider mt-2">Διαχείριση Παρουσιών</p>
         </div>
 
         <div className="flex-1 space-y-6">
@@ -208,6 +211,11 @@ const Dashboard = () => {
               <div>
                 <p className="text-sm font-medium text-slate-900">{currentUser?.name}</p>
                 <p className="text-xs text-slate-500">{currentUser?.email}</p>
+                {currentUser?.is_admin && (
+                  <span className="inline-block mt-1 text-[10px] bg-slate-700 text-white px-2 py-0.5 rounded uppercase tracking-wider">
+                    Admin
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -243,15 +251,28 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <Button
-          data-testid="logout-button"
-          onClick={handleLogout}
-          variant="outline"
-          className="w-full"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Αποσύνδεση
-        </Button>
+        <div className="space-y-2">
+          {currentUser?.is_admin && (
+            <Button
+              data-testid="admin-button"
+              onClick={() => navigate('/admin')}
+              variant="outline"
+              className="w-full"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Διαχείριση
+            </Button>
+          )}
+          <Button
+            data-testid="logout-button"
+            onClick={handleLogout}
+            variant="outline"
+            className="w-full"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Αποσύνδεση
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}

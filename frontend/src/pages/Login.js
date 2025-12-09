@@ -41,11 +41,14 @@ const Login = () => {
       <div className="w-full lg:w-2/5 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-              OfficePulse
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              251 ΓΝΑ
             </h1>
-            <p className="text-slate-600 text-lg">
-              Διαχείριση παρουσιών γραφείου
+            <h2 className="text-xl font-semibold text-slate-700">
+              Κέντρο Μηχανογράφησης
+            </h2>
+            <p className="text-slate-600 text-base mt-4">
+              Σύστημα Διαχείρισης Παρουσιών
             </p>
           </div>
 
@@ -96,10 +99,10 @@ const Login = () => {
       <div
         className="hidden lg:block lg:w-3/5 bg-cover bg-center"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1758448511255-ac2a24a135d7?crop=entropy&cs=srgb&fm=jpg&q=85)'
+          backgroundImage: 'url(https://images.unsplash.com/photo-1506399558188-acca6f8cbf41?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHw0fHxJVCUyMHNlcnZlciUyMHJvb20lMjBkYXRhJTIwY2VudGVyJTIwdGVjaG5vbG9neXxlbnwwfHx8fDE3NjUyNjQzNDJ8MA&ixlib=rb-4.1.0&q=85)'
         }}
       >
-        <div className="h-full w-full bg-slate-900/10 backdrop-blur-[1px]" />
+        <div className="h-full w-full bg-slate-900/20 backdrop-blur-[0.5px]" />
       </div>
     </div>
   );
