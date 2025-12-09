@@ -1,0 +1,151 @@
+{
+  "identity": {
+    "name": "E1",
+    "persona": "The Anti-AI Designer",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ]
+  },
+  "project_context": {
+    "app_name": "OfficePulse",
+    "app_type": "Dashboard / Utility",
+    "target_audience": "Office Staff",
+    "emotional_tone": "Calm, Transparent, Efficient, Professional",
+    "visual_style": "Soft Utility / Swiss Planner",
+    "theme_strategy": "Light Mode Default (Clean, Paper-like)",
+    "key_goal": "Effortless attendance tracking with high visibility"
+  },
+  "typography": {
+    "primary_font": "Manrope",
+    "secondary_font": "IBM Plex Sans",
+    "usage": {
+      "headings": "Manrope, font-semibold, tracking-tight",
+      "body": "IBM Plex Sans, font-normal, leading-relaxed",
+      "ui_elements": "IBM Plex Sans, font-medium, tracking-wide (uppercase for labels)"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tighter",
+      "h2": "text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-medium",
+      "body": "text-base text-slate-600",
+      "caption": "text-xs text-slate-400 uppercase tracking-wider"
+    }
+  },
+  "colors": {
+    "palette_name": "Slate & Mint (Archetype 3: Soft Utility)",
+    "primary": {
+      "name": "Slate",
+      "hex": "#334155",
+      "tailwind": "slate-700",
+      "usage": "Primary Buttons, Active States, Headings"
+    },
+    "secondary": {
+      "name": "Soft Paper",
+      "hex": "#F8FAFC",
+      "tailwind": "slate-50",
+      "usage": "App Background, Sidebar Background"
+    },
+    "accents": {
+      "present": {
+        "name": "Emerald",
+        "hex": "#10B981",
+        "tailwind": "emerald-500",
+        "usage": "Status: Present in Office"
+      },
+      "remote": {
+        "name": "Amber",
+        "hex": "#F59E0B",
+        "tailwind": "amber-500",
+        "usage": "Status: Remote / Notes"
+      },
+      "absent": {
+        "name": "Rose",
+        "hex": "#F43F5E",
+        "tailwind": "rose-500",
+        "usage": "Status: Absent / Leave"
+      }
+    },
+    "neutrals": {
+      "border": "slate-200",
+      "text_primary": "slate-900",
+      "text_secondary": "slate-500"
+    }
+  },
+  "layout_strategy": {
+    "grid_system": "The Control Room Grid (Mode B)",
+    "spacing": "Generous (2x standard). Use p-6, p-8 for containers.",
+    "structure": {
+      "login_page": "Split Screen. Left: Minimalist Form (40%). Right: Hero Image (60%).",
+      "dashboard": "Sidebar (20% / 250px fixed) + Main Content (Flex Grow).",
+      "calendar_view": "Custom Grid. 7 Columns. Rows auto-expand. Cells must have min-height (e.g., 120px)."
+    }
+  },
+  "components": {
+    "library": "Shadcn/UI",
+    "customization_rules": [
+      "Radius: rounded-lg (8px) for a friendly but professional look.",
+      "Shadows: shadow-sm for cards, shadow-xl for modals.",
+      "Borders: border-slate-100 for subtle separation.",
+      "Inputs: bg-white border-slate-200 focus:ring-slate-400"
+    ],
+    "specific_components": {
+      "calendar": "Use Shadcn Calendar for date picking in forms. Build a CUSTOM CSS Grid for the main monthly view.",
+      "dialog": "Use for 'Add Attendance' modal. Clean, focused, no clutter.",
+      "avatar": "Use for user profiles. Add a status indicator dot (green/amber/red) on the avatar ring.",
+      "toast": "Use Sonner for success/error messages."
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "Use sparingly. Only on sticky headers or modal overlays (backdrop-blur-sm bg-white/80).",
+    "micro_interactions": "Hover on calendar cells: slight lift (-translate-y-1) and shadow increase.",
+    "empty_states": "Use minimalist line icons or subtle illustrations for empty days."
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "Login Background",
+        "url": "https://images.unsplash.com/photo-1758448511255-ac2a24a135d7?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Minimalist, bright contemporary office lobby. Sets a professional tone."
+      },
+      {
+        "category": "User Avatar 1",
+        "url": "https://images.unsplash.com/photo-1755190897791-7040dfdb988f?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Professional male smiling."
+      },
+      {
+        "category": "User Avatar 2",
+        "url": "https://images.pexels.com/photos/7682346/pexels-photo-7682346.jpeg",
+        "description": "Professional female."
+      },
+      {
+        "category": "User Avatar 3",
+        "url": "https://images.pexels.com/photos/7491162/pexels-photo-7491162.jpeg",
+        "description": "Professional team member."
+      }
+    ],
+    "icons": "Lucide React (Default). Use thin strokes (stroke-width={1.5}) for elegance."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'Manrope' and 'IBM Plex Sans' via Google Fonts in index.css.",
+    "2. THEME: Configure tailwind.config.js with the 'Slate & Mint' palette.",
+    "3. LOGIN: Build the Login page first. Use the provided background image. Center the Google Login button.",
+    "4. DASHBOARD: Create the Sidebar + Main Content layout. Sidebar lists team members with status dots.",
+    "5. CALENDAR: The core feature. Do NOT use a tiny date-picker for the main view. Build a full-width CSS Grid (grid-cols-7) representing the month.",
+    "6. INTERACTION: Clicking a day opens a Dialog to set status (Present/Remote/Absent) and add a Note.",
+    "7. DATA: Mock the attendance data initially to visualize the grid population.",
+    "8. GREEK SUPPORT: Ensure fonts support Greek characters (Manrope/IBM Plex Sans do). UI text should be in Greek as per prompt."
+  ],
+  "universal_guidelines": [
+    "Avoid generic 'Bootstrap' layouts.",
+    "Use 2x more whitespace than you think is necessary.",
+    "All interactive elements must have hover states.",
+    "Do not use gradients for text.",
+    "Ensure high contrast for accessibility.",
+    "Add data-testid to all interactive elements."
+  ]
+}
