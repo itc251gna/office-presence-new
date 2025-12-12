@@ -6,11 +6,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <button
-        onClick={loginWithGoogle}
-        className="rounded-md bg-slate-900 text-white px-4 py-2"
-      >
-        Σύνδεση με Google
-      </button>
+  onClick={() => {
+    console.log("CLICK");
+    console.log("AUTH URL:", import.meta.env.VITE_AUTH_URL);
+  }}
+  className="rounded-md bg-slate-900 text-white px-4 py-2"
+>
+  Σύνδεση με Google
+</button>
     </div>
   );
 }
