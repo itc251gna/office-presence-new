@@ -25,6 +25,10 @@ export function AuthProvider({ children }) {
     fetchMe();
   }, []);
 
+function loginWithGoogle() {
+    window.location.href = import.meta.env.VITE_AUTH_URL;
+  }
+  
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
