@@ -7,6 +7,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  function loginWithGoogle() {
+    window.location.href = import.meta.env.VITE_AUTH_URL;
+  }
+
   useEffect(() => {
     async function fetchMe() {
       try {
@@ -15,7 +19,7 @@ export function AuthProvider({ children }) {
           { withCredentials: true }
         );
         setUser(res.data);
-      } catch (err) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -25,12 +29,8 @@ export function AuthProvider({ children }) {
     fetchMe();
   }, []);
 
-function loginWithGoogle() {
-    window.location.href = import.meta.env.VITE_AUTH_URL;
-  }
-  
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
