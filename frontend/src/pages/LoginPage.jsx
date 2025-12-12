@@ -7,9 +7,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center">
       <button
   onClick={() => {
-    console.log("CLICK");
-    console.log("AUTH URL:", import.meta.env.VITE_AUTH_URL);
-  }}
+  console.log("CLICK OK");
+  console.log(import.meta.env.VITE_AUTH_URL);
+  window.location.href = import.meta.env.VITE_AUTH_URL;
+}}
   className="rounded-md bg-slate-900 text-white px-4 py-2"
 >
   Σύνδεση με Google
