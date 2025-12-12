@@ -4,14 +4,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 4173"
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.5.1",
     "axios": "^1.8.4",
-    "lucide-react": "^0.507.0"
+    "lucide-react": "^0.507.0",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "vite": "^6.0.0",
